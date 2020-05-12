@@ -1,0 +1,97 @@
+Turbo Assembler	 Version 4.1	    03/03/20 20:33:35	    Page 1
+bub_sort.asm
+
+
+
+      1				     locals @@
+      2
+      3	0000			     .model tiny
+      4
+      5				     public Bubble_Sort
+      6
+      7	0000			     .data
+      8	0000  06 08 03 09 03 06	04+  dataArray db 6, 8,	3, 9, 3, 6, 4, 7, 2, 3
+      9	      07 02 03
+     10	000A  000A		     dataSize dw 10D
+     11
+     12	000C			     .code
+     13	      =B800		     VIDEO_SEGMENT   equ 0b800H
+     14	      =0050		     SCREEN_WIDTH    equ 80D
+     15	      =0019		     SCREEN_HEIGHT   equ 25D
+     16
+     17				     ; Sorts an	array of bytes
+     18				     ; Input:	     es	- array	address	segment
+     19				     ;		     di	- array	address
+     20				     ;		     cx	- array	size
+     21				     ; Detroy:	     ax, bx, cx, dx
+     22	0000			     Bubble_Sort proc
+     23	      =0002			     arrOffset	     equ 2   ; Offset between elements in memory
+     24
+     25	0000  83 E9 02			     sub cx, arrOffset
+     26	0003				     @@Sort_loop:
+     27	0003  BA 0000				     mov dx, 0	     ; Current element index
+     28
+     29	0006					     @@SortInner_loop:
+     30	0006  8B DF					     mov bx, di
+     31	0008  03 DA					     add bx, dx
+     32
+     33	000A  26: 8A 07					     mov al, es:[bx]
+     34	000D  26: 3A 47	02				     cmp al, es:[bx+arrOffset]
+     35	0011  72 0B					     jb	@@if_not_inverse
+     36	0013  26: 8A 67	02					     mov ah, es:[bx+arrOffset]
+     37	0017  26: 88 27						     mov es:[bx], ah
+     38	001A  26: 88 47	02					     mov es:[bx+arrOffset], al
+     39	001E						     @@if_not_inverse:
+     40
+     41	001E  83 C2 02					     add dx, arrOffset
+     42	0021  3B D1					     cmp dx, cx
+     43	0023  75 E1					     jne @@SortInner_loop
+     44
+     45	0025  83 E9 02				     sub cx, arrOffset
+     46	0028  83 F9 00				     cmp cx, 0
+     47	002B  75 D6				     jne @@Sort_loop
+     48
+     49	002D  C3			     ret
+     50	002E				     Bubble_Sort endp
+     51				     end
+Turbo Assembler	 Version 4.1	    03/03/20 20:33:35	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "03/03/20"
+??FILENAME			  Text	 "bub_sort"
+??TIME				  Text	 "20:33:35"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@IF_NOT_INVERSE		  Near	 DGROUP:001E
+@@SORTINNER_LOOP		  Near	 DGROUP:0006
+@@SORT_LOOP			  Near	 DGROUP:0003
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 BUB_SORT
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ARROFFSET			  Number 0002
+BUBBLE_SORT			  Near	 DGROUP:0000
+DATAARRAY			  Byte	 DGROUP:0000
+DATASIZE			  Word	 DGROUP:000A
+SCREEN_HEIGHT			  Number 0019
+SCREEN_WIDTH			  Number 0050
+VIDEO_SEGMENT			  Number B800
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  000C Word	  Public  DATA
+  _TEXT				  16  002E Word	  Public  CODE
+

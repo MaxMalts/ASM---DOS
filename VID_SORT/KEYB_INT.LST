@@ -1,0 +1,175 @@
+Turbo Assembler	 Version 4.1	    03/03/20 20:33:45	    Page 1
+keyb_int.asm
+
+
+
+      1	0000			     .model tiny
+      2
+      3				     extrn Bubble_Sort:	near
+      4
+      5	0000			     .data
+      6	0000  00		     hotkeysPressed db 0
+      7
+      8	0001			     .code
+      9				     org 100H
+     10
+     11	0100			     Start:
+     12	      =B800			     VIDEO_SEGMENT   equ 0b800H
+     13	      =0050			     SCREEN_WIDTH    equ 80D
+     14	      =0019			     SCREEN_HEIGHT   equ 25D
+     15	      =0060			     KEYB_PORT	     equ 60H
+     16	      =0024			     KEYB_INTER	     equ 9*4
+     17	      =00EA			     JMPFAR_COMMAND  equ 0eaH
+     18
+     19	0100  FA			     cli
+     20	0101  B8 0000			     mov ax, 0
+     21	0104  8E C0			     mov es, ax
+     22
+     23	0106  BB 0024			     mov bx, KEYB_INTER
+     24	0109  26: 8B 07			     mov ax, word ptr es:[bx]
+     25	010C  A3 0157r			     mov OldInter, ax
+     26	010F  26: 8B 47	02		     mov ax, word ptr es:[bx+2]
+     27	0113  A3 0159r			     mov OldInter+2, ax
+     28
+     29	0116  26: C7 07	0128r		     mov word ptr es:[bx], offset New09Interrupt
+     30	011B  26: 8C 4F	02		     mov word ptr es:[bx+2], cs
+     31	011F  FB			     sti
+     32
+     33	0120  B8 3100			     mov ax, 3100H   ; Exit program but	don't unload it	from RAM
+     34	0123  BA 01D3			     mov dx, 1d3H
+     35	0126  CD 21			     int 21H
+     36
+     37
+     38	0128				     New09Interrupt proc
+     39	      =002A				     HOT_KEY_1	     equ 2aH ; left shift
+     40	      =0039				     HOT_KEY_2	     equ 39H ; space
+     41
+     42
+     43	0128  50 53 51 52 06 57	1E		     push ax bx	cx dx es di ds
+     44
+     45	012F  8C C8				     mov ax, cs
+     46	0131  8E D8				     mov ds, ax
+     47
+     48	0133  B7 2A				     mov bh, HOT_KEY_1
+     49	0135  B3 39				     mov bl, HOT_KEY_2
+     50	0137  E8 0022				     call Handle_Hotkeys
+     51
+     52	013A  80 3E 0000r C0			     cmp hotkeysPressed, 11000000B
+     53	013F  75 0E				     jne @@end_if_hotkeysPressed
+     54	0141  B8 B800					     mov ax, VIDEO_SEGMENT
+     55	0144  8E C0					     mov es, ax
+     56	0146  BF 0000					     mov di, 0
+     57	0149  B9 0FA0					     mov cx, SCREEN_WIDTH*SCREEN_HEIGHT*2
+Turbo Assembler	 Version 4.1	    03/03/20 20:33:45	    Page 2
+keyb_int.asm
+
+
+
+     58	014C  E8 0000e					     call Bubble_Sort
+     59	014F					     @@end_if_hotkeysPressed:
+     60
+     61	014F  1F 5F 07 5A 59 5B	58		     pop ds di es dx cx	bx ax
+     62
+     63						     ; Jump to old interrupt handler:
+     64	0156  EA					     db	JMPFAR_COMMAND
+     65	0157  0000			     OldInter	     dw	0    ; jmp arguments
+     66	0159  0000					     dw	0
+     67
+     68	015B  CF				     iret
+     69	015C					     New09Interrupt endp
+     70
+     71
+     72					     ; Handles hotkeys
+     73					     ; Input:	     bl	- first	key
+     74					     ;		     bh	- second key
+     75					     ; Output:	     (var) hotkeysPressed - if i-th bit	is 1 (0)
+     76					     ;		     then the i-th key is pressed (not pressed)
+     77					     ; Destroy:	     ax
+     78	015C				     Handle_Hotkeys proc
+     79	015C  E4 60				     in	al, KEYB_PORT
+     80	015E  3A C7				     cmp al, bh
+     81	0160  74 11				     je	@@First_pressed
+     82
+     83	0162  3A C3				     cmp al, bl
+     84	0164  74 15				     je	@@Second_pressed
+     85
+     86	0166  2C 80				     sub al, 80H
+     87	0168  3A C7				     cmp al, bh
+     88	016A  74 17				     je	@@First_released
+     89
+     90	016C  3A C3				     cmp al, bl
+     91	016E  74 1B				     je	@@Second_released
+     92	0170  EB 21 90				     jmp @@end_switch
+     93
+     94
+     95	0173					     @@First_pressed:
+     96	0173  80 0E 0000r 80				     or	hotkeysPressed,	10000000B
+     97	0178  EB 19 90					     jmp @@end_switch
+     98
+     99	017B					     @@Second_pressed:
+    100	017B  80 0E 0000r 40				     or	hotkeysPressed,	01000000B
+    101	0180  EB 11 90					     jmp @@end_switch
+    102
+    103	0183					     @@First_released:
+    104	0183  80 26 0000r 7F				     and hotkeysPressed, 01111111B
+    105	0188  EB 09 90					     jmp @@end_switch
+    106
+    107	018B					     @@Second_released:
+    108	018B  80 26 0000r BF				     and hotkeysPressed, 10111111B
+    109	0190  EB 01 90					     jmp @@end_switch
+    110	0193					     @@end_switch:
+    111
+    112	0193  C3				     ret
+    113	0194					     Handle_Hotkeys endp
+    114				     end Start
+Turbo Assembler	 Version 4.1	    03/03/20 20:33:45	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "03/03/20"
+??FILENAME			  Text	 "keyb_int"
+??TIME				  Text	 "20:33:45"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@END_IF_HOTKEYSPRESSED		  Near	 DGROUP:014F
+@@END_SWITCH			  Near	 DGROUP:0193
+@@FIRST_PRESSED			  Near	 DGROUP:0173
+@@FIRST_RELEASED		  Near	 DGROUP:0183
+@@SECOND_PRESSED		  Near	 DGROUP:017B
+@@SECOND_RELEASED		  Near	 DGROUP:018B
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 KEYB_INT
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+BUBBLE_SORT			  Near	 ----:---- Extern
+HANDLE_HOTKEYS			  Near	 DGROUP:015C
+HOTKEYSPRESSED			  Byte	 DGROUP:0000
+HOT_KEY_1			  Number 002A
+HOT_KEY_2			  Number 0039
+JMPFAR_COMMAND			  Number 00EA
+KEYB_INTER			  Number 0024
+KEYB_PORT			  Number 0060
+NEW09INTERRUPT			  Near	 DGROUP:0128
+OLDINTER			  Word	 DGROUP:0157
+SCREEN_HEIGHT			  Number 0019
+SCREEN_WIDTH			  Number 0050
+START				  Near	 DGROUP:0100
+VIDEO_SEGMENT			  Number B800
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0001 Word	  Public  DATA
+  _TEXT				  16  0194 Word	  Public  CODE
+

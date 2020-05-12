@@ -1,0 +1,225 @@
+Turbo Assembler	 Version 4.1	    03/29/20 00:44:48	    Page 1
+pas_hack.asm
+
+
+
+      1				     locals @@
+      2
+      3	0000			     .model tiny
+      4
+      5				     extrn Strcmp: near
+      6	      =000D		     CR	     equ 0dH
+      7	      =000A		     LF	     equ 0aH
+      8
+      9	0000			     .code
+     10				     org 100H
+     11	0100			     Start:
+     12	0100  8C C8			     mov ax, cs
+     13	0102  8E D8			     mov ds, ax
+     14	0104  BA 0000r			     mov dx, offset askPassword
+     15	0107  E8 004E			     call Puts
+     16
+     17	010A  8C C8			     mov ax, cs
+     18	010C  8E C0			     mov es, ax
+     19	010E  BF 0013r			     mov di, offset usrInput
+     20	0111  E8 0029			     call Gets
+     21
+     22					     ; es and ds already set
+     23	0114  BE 000Br			     mov si, offset password
+     24	0117  BF 0013r			     mov di, offset usrInput
+     25	011A  E8 0000e			     call Strcmp
+     26
+     27	011D  74 09			     je	@@correct
+     28	011F  F6 16 0033r			     not passwordCorrect     ; passwordCorrect = !passwordCorrect
+     29	0123  80 26 0033r 01			     and passwordCorrect, 1
+     30	0128				     @@correct:
+     31
+     32	0128  80 3E 0033r 00		     cmp passwordCorrect, 0
+     33	012D  74 06			     je	@@if_not_correct
+     34	012F  E8 002B				     call AllowAccess
+     35	0132  EB 04 90				     jmp @@end_if_correct
+     36	0135				     @@if_not_correct:
+     37	0135  E8 0030				     call DenyAccess
+     38	0138				     @@end_if_correct:
+     39
+     40	0138  B8 4C00			     mov ax, 4c00H
+     41	013B  CD 21			     int 21H
+     42
+     43	013D			     .data
+     44	0000  50 61 73 73 77 6F	72+  askPassword db 'Password: ', '$'
+     45	      64 3A 20 24
+     46	000B  6D 75 72 20 6D 75	72+  password db 'mur mur', '$'
+     47	      24
+     48	0013  20*(00)		     usrInput db 32 dup(0)
+     49	0033  01		     passwordCorrect db	1
+     50
+     51
+     52	0034			     .code
+     53				     ; Reads a string from input
+     54				     ; Input:	     es:di - buffer address (be	careful	with size)
+     55				     ; Output:	     In	buffer
+     56				     ; Destroy:	     ax, di
+     57	013D			     Gets    proc
+Turbo Assembler	 Version 4.1	    03/29/20 00:44:48	    Page 2
+pas_hack.asm
+
+
+
+     58	      =0008			     CHAR_INPUT	     equ 08H
+     59
+     60	013D				     @@input_loop:
+     61	013D  B4 08				     mov ah, CHAR_INPUT
+     62	013F  CD 21				     int 21H
+     63
+     64	0141  3C 0D				     cmp al, CR
+     65	0143  74 0F				     je	@@end_input_loop
+     66	0145  3C 0A				     cmp al, LF
+     67	0147  74 0B				     je	@@end_input_loop
+     68	0149  3C 24				     cmp al, '$'
+     69	014B  74 07				     je	@@end_input_loop
+     70	014D  3C 00				     cmp al, 0
+     71	014F  74 03				     je	@@end_input_loop
+     72
+     73	0151  AA				     stosb
+     74
+     75	0152  EB E9				     jmp @@input_loop
+     76	0154					     @@end_input_loop:
+     77
+     78	0154  B0 24			     mov al, '$'
+     79	0156  AA			     stosb
+     80
+     81	0157  C3			     ret
+     82	0158				     Gets    endp
+     83
+     84
+     85				     ; Prints '$' - terminated string to console
+     86				     ; Input:	     di:dx - string address
+     87				     ; Output:	     In	console
+     88				     ; Destroy:	     ah
+     89	0158			     Puts    proc
+     90	      =0009			     STRING_OUTPUT   equ 09H
+     91
+     92	0158  B4 09			     mov ah, STRING_OUTPUT
+     93	015A  CD 21			     int 21H
+     94
+     95	015C  C3			     ret
+     96	015D				     Puts    endp
+     97
+     98
+     99				     ; Input:	     ds:si - password
+    100				     ;		     es:di - user input
+    101				     ; Output:	     ah	- 1: password correct, 0: password incorrect
+    102				     ; Destroy:	     si, di, cx
+    103				     ;CheckPassword   proc
+    104				     ;	      call Strcmp
+    105				     ;
+    106				     ;	      jne @@if_not_correct
+    107				     ;		      mov ah, 1
+    108				     ;		      jmp @@end_if_correct
+    109				     ;	      @@if_not_correct:
+    110				     ;		      mov ah, 0
+    111				     ;	      @@end_if_correct:
+    112				     ;
+    113				     ;	      ret
+    114				     ;	      CheckPassword   endp
+Turbo Assembler	 Version 4.1	    03/29/20 00:44:48	    Page 3
+pas_hack.asm
+
+
+
+    115
+    116
+    117				     ; Represents a function that will be called
+    118				     ; if passsword is correct,	prints 'Access allowed'
+    119				     ; Input:	     -
+    120				     ; Output:	     In	console
+    121				     ; Destroy:	     ax, dx, ds
+    122	015D			     AllowAccess    proc
+    123
+    124	015D  8C C8			     mov ax, cs
+    125	015F  8E D8			     mov ds, ax
+    126	0161  BA 0034r			     mov dx, offset allowStr
+    127	0164  E8 FFF1			     call Puts
+    128
+    129	0167  C3			     ret
+    130	0168				     AllowAccess     endp
+    131
+    132	0168			     .data
+    133	0034  41 63 63 65 73 73	20+  allowStr db 'Access allowed', '$'
+    134	      61 6C 6C 6F 77 65	64+
+    135	      24
+    136
+    137
+    138	0043			     .code
+    139				     ; Represents a function that will be called
+    140				     ; if passsword is incorrect, prints 'access denied'
+    141				     ; Input:	     -
+    142				     ; Output:	     In	console
+    143				     ; Destroy:	     ax, dx, ds
+    144	0168			     DenyAccess	     proc
+    145
+    146	0168  8C C8			     mov ax, cs
+    147	016A  8E D8			     mov ds, ax
+    148	016C  BA 0043r			     mov dx, offset denyStr
+    149	016F  E8 FFE6			     call Puts
+    150
+    151	0172  C3			     ret
+    152	0173				     DenyAccess	     endp
+    153
+    154	0173			     .data
+    155	0043  41 63 63 65 73 73	20+  denyStr db	'Access	denied', '$'
+    156	      64 65 6E 69 65 64	24
+    157
+    158				     end Start
+Turbo Assembler	 Version 4.1	    03/29/20 00:44:48	    Page 4
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "03/29/20"
+??FILENAME			  Text	 "pas_hack"
+??TIME				  Text	 "00:44:48"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@CORRECT			  Near	 DGROUP:0128
+@@END_IF_CORRECT		  Near	 DGROUP:0138
+@@END_INPUT_LOOP		  Near	 DGROUP:0154
+@@IF_NOT_CORRECT		  Near	 DGROUP:0135
+@@INPUT_LOOP			  Near	 DGROUP:013D
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _DATA
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 PAS_HACK
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ALLOWACCESS			  Near	 DGROUP:015D
+ALLOWSTR			  Byte	 DGROUP:0034
+ASKPASSWORD			  Byte	 DGROUP:0000
+CHAR_INPUT			  Number 0008
+CR				  Number 000D
+DENYACCESS			  Near	 DGROUP:0168
+DENYSTR				  Byte	 DGROUP:0043
+GETS				  Near	 DGROUP:013D
+LF				  Number 000A
+PASSWORD			  Byte	 DGROUP:000B
+PASSWORDCORRECT			  Byte	 DGROUP:0033
+PUTS				  Near	 DGROUP:0158
+START				  Near	 DGROUP:0100
+STRCMP				  Near	 ----:---- Extern
+STRING_OUTPUT			  Number 0009
+USRINPUT			  Byte	 DGROUP:0013
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0051 Word	  Public  DATA
+  _TEXT				  16  0173 Word	  Public  CODE
+

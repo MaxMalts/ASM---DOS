@@ -1,0 +1,113 @@
+Turbo Assembler	 Version 4.1	    02/17/20 23:53:51	    Page 1
+unit.asm
+
+
+
+      1	0000			     .model tiny
+      2
+      3	0000			     .data
+      4				     extrn Memchr:near,	Memcmp:near, Memset:near, Memcpy:near, \
+      5					   Strlen:near,	Strchr:near, Strcpy:near, Strcmp:near
+      6	0000  54 68 69 73 20 69	73+  string1 db	"This is the first string$"
+      7	      20 74 68 65 20 66	69+
+      8	      72 73 74 20 73 74	72+
+      9	      69 6E 67 24
+     10	0019  54 68 69 73 20 69	73+  string2 db	"This is the second string$"
+     11	      20 74 68 65 20 73	65+
+     12	      63 6F 6E 64 20 73	74+
+     13	      72 69 6E 67 24
+     14	0033  08*(00)		     array db 8	dup(0)
+     15	003B  1E*(00)		     string db 30 dup(0)
+     16
+     17	0059			     .code
+     18				     org 100H
+     19
+     20	0100			     Start:
+     21	0100  B0 65			     mov al, 'e'
+     22	0102  BF 0000r			     mov di, offset string1
+     23	0105  B9 000E			     mov cx, 14D
+     24	0108  E8 0000e			     call Memchr
+     25
+     26	010B  BE 0000r			     mov si, offset string1
+     27	010E  BF 0019r			     mov di, offset string2
+     28	0111  B9 000F			     mov cx, 15D
+     29	0114  E8 0000e			     call Memcmp
+     30
+     31	0117  BF 0033r			     mov di, offset array
+     32	011A  B0 79			     mov al, 'y'
+     33	011C  B9 0005			     mov cx, 5D
+     34	011F  E8 0000e			     call Memset
+     35
+     36	0122  BE 0000r			     mov si, offset string1
+     37	0125  BF 0033r			     mov di, offset array
+     38	0128  B9 0006			     mov cx, 6D
+     39	012B  E8 0000e			     call Memcpy
+     40
+     41	012E  BF 0000r			     mov di, offset string1
+     42	0131  E8 0000e			     call Strlen
+     43
+     44	0134  BF 0000r			     mov di, offset string1
+     45	0137  B0 65			     mov al, 'e'
+     46	0139  E8 0000e			     call Strchr
+     47
+     48	013C  BE 0000r			     mov si, offset string1
+     49	013F  BF 003Br			     mov di, offset string
+     50	0142  E8 0000e			     call Strcpy
+     51
+     52	0145  BE 0000r			     mov si, offset string1
+     53	0148  BF 0019r			     mov di, offset string2
+     54	014B  E8 0000e			     call Strcmp
+     55
+     56	014E  B8 4C00			     mov ax, 4c00H
+     57	0151  CD 21			     int 21H
+Turbo Assembler	 Version 4.1	    02/17/20 23:53:51	    Page 2
+unit.asm
+
+
+
+     58
+     59					     end Start
+Turbo Assembler	 Version 4.1	    02/17/20 23:53:51	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/17/20"
+??FILENAME			  Text	 "unit	  "
+??TIME				  Text	 "23:53:51"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 UNIT
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ARRAY				  Byte	 DGROUP:0033
+MEMCHR				  Near	 DGROUP:---- Extern
+MEMCMP				  Near	 DGROUP:---- Extern
+MEMCPY				  Near	 DGROUP:---- Extern
+MEMSET				  Near	 DGROUP:---- Extern
+START				  Near	 DGROUP:0100
+STRCHR				  Near	 DGROUP:---- Extern
+STRCMP				  Near	 DGROUP:---- Extern
+STRCPY				  Near	 DGROUP:---- Extern
+STRING				  Byte	 DGROUP:003B
+STRING1				  Byte	 DGROUP:0000
+STRING2				  Byte	 DGROUP:0019
+STRLEN				  Near	 DGROUP:---- Extern
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0059 Word	  Public  DATA
+  _TEXT				  16  0153 Word	  Public  CODE
+
