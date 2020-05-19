@@ -25,11 +25,11 @@ Start:
         mov ax, cs
         mov es, ax
         mov di, offset usrInput
-	mov cx, INPUT_LENGTH
+		mov cx, INPUT_LENGTH
         call Gets
 	
         ; es already set
-	mov di, offset pLtr_1
+		mov di, offset pLtr_1
         call calcListHash 
         push ax 
 
@@ -57,24 +57,24 @@ Start:
 
 .data
 pLtr_2		db 'u'
-		dw offset pLtr_3
+			dw offset pLtr_3
 
 askPassword	db 'Password: ', '$'
 
 pLtr_1		db 'm'	; First letter of password
-                dw offset pLtr_2
+            dw offset pLtr_2
 
 pLtr_8		db '$'
-                dw 0
+            dw 0
 
 INPUT_LENGTH	equ 20
 usrInput	db INPUT_LENGTH dup(0)
 
 pLtr_3		db 'r'
-                dw offset pLtr_4
+            dw offset pLtr_4
 
 pLtr_4		db ' '
-                dw offset pLtr_5
+            dw offset pLtr_5
 
 passwordCorrect	db 1
 

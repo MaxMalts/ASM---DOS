@@ -35,8 +35,8 @@ Start:
         
                 push ax bx cx dx ds es di si
 
-		mov ax, cs
-		mov ds, ax
+				mov ax, cs
+				mov ds, ax
 
                 cmp borderDrawn, 0
                 jne @@if_borderDrawn
@@ -51,13 +51,13 @@ Start:
                         call Draw_Border
 
                         in al, keybPort
-			mov Message, 0
+						mov Message, 0
                         mov Message+1, al
                         mov Message+2, '$'
-			mov di, offset Message
+						mov di, offset Message
 
-			mov ax, cs
-			mov es, ax
+						mov ax, cs
+						mov es, ax
                         call Draw_Message
                 @@end_if_borderDrawn:
 

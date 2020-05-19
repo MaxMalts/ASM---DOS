@@ -112,7 +112,7 @@ Start:
 
         mov al, scrWidth        ; ax - current corner position
         mul bl
-	mov cl, bh
+		mov cl, bh
         add ax, cx
         add ax, ax
         mov rightBottomCorner, ax
@@ -122,7 +122,7 @@ Start:
 
         mov al, scrWidth        ; ax - current corner position
         mul bl
-	mov cl, bh
+		mov cl, bh
         add ax, cx
         add ax, ax
         mov rightTopCorner, ax

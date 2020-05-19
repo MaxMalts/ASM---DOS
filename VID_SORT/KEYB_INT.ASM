@@ -21,23 +21,23 @@ Start:
         KEYB_INTER      equ 9*4
         JMPFAR_COMMAND  equ 0eaH
 	
-	cli
-	mov ax, 0
-	mov es, ax
+		cli
+		mov ax, 0
+		mov es, ax
 
         mov bx, KEYB_INTER
-	mov ax, word ptr es:[bx]
-	mov OldInter, ax
-	mov ax, word ptr es:[bx+2]
-	mov OldInter+2, ax
+		mov ax, word ptr es:[bx]
+		mov OldInter, ax
+		mov ax, word ptr es:[bx+2]
+		mov OldInter+2, ax
 
         mov word ptr es:[bx], offset New09Interrupt
-	mov word ptr es:[bx+2], cs                        
-	sti
+		mov word ptr es:[bx+2], cs                        
+		sti
 
-	mov ax, 3100H	; Exit program but don't unload it from RAM
-	mov dx, 1d3H
-	int 21H
+		mov ax, 3100H	; Exit program but don't unload it from RAM
+		mov dx, 1d3H
+		int 21H
 
 
         New09Interrupt proc
@@ -47,8 +47,8 @@ Start:
         
                 push ax bx cx dx es di ds
 
-		mov ax, cs
-		mov ds, ax
+				mov ax, cs
+				mov ds, ax
 
                 mov bh, HOT_KEY_1
                 mov bl, HOT_KEY_2

@@ -32,10 +32,10 @@ Bubble_Sort proc
                         
                         mov al, es:[bx]
                         mov ah, es:[bx+arrOffset]
-			push bx
+						push bx
                         call ChCmp
-			cmp bh, 2
-			pop bx
+						cmp bh, 2
+						pop bx
                         jb @@end_if_inverse
                                 mov ah, es:[bx+arrOffset]
                                 mov es:[bx], ah
