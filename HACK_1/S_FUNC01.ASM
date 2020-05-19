@@ -74,11 +74,13 @@ Memcpy proc
 ; Destroy:      di, cx, al
 Strlen proc
         mov al, '$'
-        mov cx, 0ffffH
+        xor cx, cx
+        dec cx      ; 0ffffH
 
         repne scasb
 
-        mov ax, 0fffeH
+        xor ax, ax
+        sub ax, 2   ; 0fffeH
         sub ax, cx
 
         ret
