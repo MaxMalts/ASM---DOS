@@ -136,26 +136,11 @@ Strcpy proc
 ; Destroy:      si, di, cx
 
 Strcmp proc
-        @@Func_loop:
-                cmp byte ptr ds:[si], '$'
-                jne @@If_FirstNotEnded
-                        cmp byte ptr es:[di], '$'
-                        jne @@If_SecondNotEnded_1
-                                jmp @@End_Func
-                        @@If_SecondNotEnded_1:
-                                cmp byte ptr es:[di], '$'+1D
-                                jmp @@End_func
-                @@If_FirstNotEnded:
-                        cmp byte ptr es:[di], '$'
-                        jne @@If_SecondNotEnded_2
-                                cmp byte ptr es:[di], '$'-1
-                                jmp @@End_func
-                        @@If_SecondNotEnded_2:
-                                cmpsb
-                                jne @@End_func
-                jmp @@Func_loop
+	call Strlen 
+	
+	mov cx, ax
+	call memcmp
 
-        @@End_func:
-        ret
-        Strcmp endp
+	ret
+	Strcmp endp
 end
