@@ -136,8 +136,10 @@ Strcpy proc
 ; Destroy:      si, di, cx
 
 Strcmp proc
+	push di
 	call Strlen 
 	
+	pop di
 	mov cx, ax
 	call memcmp
 
