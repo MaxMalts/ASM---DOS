@@ -14,6 +14,8 @@ public Memchr, Memcmp, Memset, Memcpy, Strlen, Strchr, Strcpy, Strcmp
 ; Output:       di - address of the first equal byte, 0 if not found
 ; Destroy:      cx
 Memchr proc
+		cld
+		
         repne scasb
         dec di
 
@@ -34,6 +36,8 @@ Memchr proc
 ; Output:       The result in flags as it would "cmp" do
 ; Destroy:      si, di, cx
 Memcmp proc
+		cld
+		
         repe cmpsb
 
         ret
@@ -47,6 +51,8 @@ Memcmp proc
 ;               cx - blocks size
 ; Destroy:      di, cx
 Memset proc
+		cld
+		
         rep stosb
 
         ret
@@ -61,6 +67,8 @@ Memset proc
 ;               cx - blocks size
 ; Destroy:      si, di, cx
 Memcpy proc
+		cld
+		
         repe movsb
 
         ret
@@ -73,6 +81,8 @@ Memcpy proc
 ; Output:       ax - length
 ; Destroy:      di, cx, al
 Strlen proc
+		cld
+		
         mov al, '$'
 		xor cx, cx
         dec cx      ; 0ffffH
@@ -92,6 +102,8 @@ Strlen proc
 ;               al - character
 ; Output:       di - address of found character, 0 if not found
 Strchr proc
+		cld
+		
         @@Func_loop:
                 cmp byte ptr[di], '$'
                 je @@Not_found
@@ -115,6 +127,8 @@ Strchr proc
 ;               di - destination string address
 ; Destroy:      si, di
 Strcpy proc
+		cld
+		
         @@Func_loop:
                 cmp byte ptr ds:[si], '$'
                 movsb
@@ -136,6 +150,8 @@ Strcpy proc
 ; Destroy:      si, di, cx
 
 Strcmp proc
+		cld
+		
 	@@loop:
 		lodsb
 		cmp al, '$'

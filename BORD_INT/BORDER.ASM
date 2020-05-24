@@ -21,7 +21,8 @@ public Message, Draw_Border, Draw_Message
 
 .code
 Start:
-
+		cld
+		
 		; Draws border
 		; Input:
 		; Variables:    bordLeftX db 30D
