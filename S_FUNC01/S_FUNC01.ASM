@@ -128,21 +128,27 @@ Strcpy proc
 
 
 ; Compares two strings
-; Input:        ds - first memory segment
-;               si - first string address
-;               es - second memory segment
-;               di - second string address
-; Output:       The result in flags as it would "cmp" do
+; Input:        es - first memory segment
+;               di - first string address
+;               ds - second memory segment
+;               si - second string address
+; Output:       ah < 0 - first below; = 0 - equal; > 0 - first above
 ; Destroy:      si, di, cx
 
 Strcmp proc
-	push di
-	call Strlen 
+	@@loop:
+		lodsb
+		cmp al, '$'
+		je @@results
+			cmp ds:[si], al
+			jne @@results
+			inc si
+		jmp @@loop
 	
-	pop di
-	mov cx, ax
-	call memcmp
-
+	@@results:
+		mov ah, ds:[si]
+		sub al, ah
+		
 	ret
 	Strcmp endp
 end
